@@ -5,6 +5,20 @@ from selenium.webdriver.support import expected_conditions as EC
 import json
 import time
 
+def chooseBrowser():
+    print("(c)hrome (f)irefox (s)afari (e)dge")
+    report = input()
+    if report == "c":
+        return webdriver.Chrome()
+    elif report == "f":
+        return webdriver.Firefox()
+    elif report == "s":
+        return webdriver.Safari()
+    elif report == "e":
+        return webdriver.Edge()
+    else:
+        print("Invalid browser choice. Defaulting to Edge.")
+        return webdriver.Edge()
 
 def log_in(USERNAME, PASSWORD, driver):
     driver.get("https://www.instagram.com/accounts/login")
@@ -23,7 +37,6 @@ def log_in(USERNAME, PASSWORD, driver):
 
     WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, \
         '/html/body/div[2]/div/div/div[2]/div/div/div[1]/section/main/div/div/div[1]/div[2]/form/div/div[3]/button'))).click()
-
 
 def get_json(username, driver):
     # get the text from site
@@ -47,14 +60,11 @@ def get_json(username, driver):
             resp_file.write(text)
         return {}
 
-
 def encode(string):
     return "".join([char for char in string if char.isnumeric()])
 
-
 def get_most_likely(usernames, alts):
     return [alt for alt in list(alts) if encode(alt) in set([encode(name) for name in usernames])]
-
 
 def print_out_txt(exists, alts):
     with open("results.txt", "w", encoding="utf-8") as res_file:
@@ -69,14 +79,12 @@ def print_out_txt(exists, alts):
         for alt in list(alts):
             res_file.write(" - " + alt + "\n")
 
-
 def print_out_csv(exists):
     par = lambda val: f'"{val}"'
     with open("username-ID.csv", "w", encoding="utf-8") as res_file:
         res_file.write('"username";"user ID";"exists"\n')
         for user in exists.keys():
             res_file.write(";".join((par(user), par(exists[user][1] if exists[user][0] else ""), par("True" if exists[user][0] else "False"))))
-
 
 def check_username(driver, username, potential_alts):
     users_json = get_json(username, driver=driver)
@@ -91,10 +99,8 @@ def check_username(driver, username, potential_alts):
             potential_alts.add(user['user']['full_name'])
         else:
             exists = (True, user['user']['pk_id'])
-
-
+            
     return exists
-
 
 def main():
     with open("wanted_usernames.txt", "r", encoding="utf-8") as wanted:
@@ -115,7 +121,7 @@ def main():
     exists = {}
 
     # open browser & log in Instagram
-    driver = webdriver.Edge()
+    driver = chooseBrowser()
     driver.implicitly_wait(10)
     log_in(MAIN_USERNAME, MAIN_PASSWORD, driver)
     time.sleep(15)
@@ -130,7 +136,6 @@ def main():
             print_out_txt(exists, potential_alts)
         case "csv":
             print_out_csv(exists)
-
 
 if '__main__':
     main()
