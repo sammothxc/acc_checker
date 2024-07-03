@@ -16,8 +16,6 @@ def log_in(USERNAME, PASSWORD, driver):
             '/html/body/div[4]/div[1]/div/div[2]/div/div/div/div/div[2]/div/button[2]'))).click()
     except:
         pass
-
-    time.sleep(4)
     
     # input name & password
     driver.find_element(By.NAME, 'username').send_keys(USERNAME)
